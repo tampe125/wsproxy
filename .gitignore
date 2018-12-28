@@ -1,4 +1,5 @@
 .idea
+custom_scripts
 node_modules/
 logs/
 *.pem
