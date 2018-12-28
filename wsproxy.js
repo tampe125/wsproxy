@@ -7,6 +7,8 @@ var WebSocketClient = require('websocket').client;
 var processor = require('./wsprocessor.js');
 var config = require('./config');
 
+const outgoing_processor = require('./custom_scripts/outgoing');
+
 var verbose = config.verbose;
 
 var getTimeStamp = processor.getTimeStamp;
@@ -196,12 +198,19 @@ createClient = function(proto, host, request, origin, connection){
                 if (verbose) {
                     doLog(['Received message on Client<->Proxy connection:',d.type,d.binaryData,d.utf8Data]);
                     if(d.type==='utf8' && !processor.ignore(1,d.utf8Data))
-                        doLog(['Relaying on Proxy<->Server connection:',processor.mangle(d.utf8Data)]);
+                        doLog(['Relaying TEXT on Proxy<->Server connection:',processor.mangle(d.utf8Data)]);
                     if(d.type!=='utf8' && !processor.ignore(1,d.binaryData))
-                        doLog(['Relaying on Proxy<->Server connection:',d.binaryData])
+                        doLog(['Relaying BINARY on Proxy<->Server connection:',d.binaryData])
                 }
 
-                (d.type==='utf8') ? clconn.sendUTF(d.utf8Data):clconn.sendBytes(d.binaryData)
+                if(d.type==='utf8'){
+                  let send_data = outgoing_processor.editTextData(d.utf8Data);
+                  clconn.sendUTF(send_data);
+                }
+                else {
+                  let send_data = outgoing_processor.editBinaryData(d.binaryData);
+                  clconn.sendBytes(send_data);
+                }
         });
 
         clconn.on('message', function(d) {
@@ -210,9 +219,9 @@ createClient = function(proto, host, request, origin, connection){
                 if (verbose) {
                     doLog(['Received message on Proxy<->Server connection:',d.type,d.binaryData,d.utf8Data]);
                     if(d.type==='utf8' && !processor.ignore(0,d.utf8Data))
-                        doLog(['Relaying on Client<->Proxy connection:',d.utf8Data]);
+                        doLog(['Relaying TEXT on Client<->Proxy connection:',d.utf8Data]);
                     if(d.type!=='utf8' && !processor.ignore(0,d.binaryData))
-                        doLog(['Relaying on Client<->Proxy connection:',d.binaryData])
+                        doLog(['Relaying BINARY on Client<->Proxy connection:',d.binaryData])
                 }
 
                 (d.type==='utf8') ? connection.sendUTF(d.utf8Data):connection.sendBytes(d.binaryData)
