@@ -1,14 +1,12 @@
 # wsproxy.js - A proxy for websockets 
 
-A simple websocket proxy that allows viewing of websocket requests, repeating requests and "Burp intruder" style replay attacks.
-Quick and dirty tool, may have plenty of bugs.
-
-For a more detailed write-up regarding the tool, see:  https://sensepost.com/blog/2015/another-intercepting-proxy/
+This is a fork from the original repository [wsproxy]( https://github.com/sensepost/wsproxy); on top of the existing 
+features, this fork will let you to edit outgoing requests "on the fly".  
 
 ## Install
 You need to setup your Nodejs environment, in the project directory:
 ```
-git clone https://github.com/sensepost/wsproxy.git
+git clone https://github.com/tampe125/wsproxy.git
 npm install
 ```
 
@@ -21,13 +19,23 @@ The tool should be easy enough to use,
 nodejs wsproxy.js
 ```
 
-To view the requests, a webserver is started up on https://127.0.0.1:8082 by default, changable in config.js. To disable this webserver, change config.webserver=true to config.webserver=false in config.js.
-To create custom mangle rules, modify "mangle" in wsprocessor.js. Replace rules also get applied here. Replace rules can be modified in config.js or altered at runtime through the web-interface.
+## Editing requests
+You will have to copy and rename the file `custom_scripts/outgoing.example.js`. You'll see that there are two different
+functions being exported: `editTextData` and `editBinaryData`. In those functions you will have to perform your editing logic.
 
-## Dependencies
-websocket - [https://github.com/theturtle32/WebSocket-Node](https://github.com/theturtle32/WebSocket-Node)
+### A quick example
+Change the `editTextData` function so it will be something like this:  
+```js
+exports.editTextData = function (data) {
+  data += " edited";
 
-A complete list is available in package.json
+  return data;
+};
+```
+
+Now attach your proxy and visit the [WebSocket echo server](https://www.websocket.org/echo.html). In the console you'll 
+see that every reply from the server has the string ` edited` appended. Since it's just an echo server, returning what you
+sent to him, this means that the message you just sent has been modified by our proxy.
 
 ## License
-WSProxy is licensed under a Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License (http://creativecommons.org/licenses/by-nc-sa/4.0/) Permissions beyond the scope of this license may be available at http://sensepost.com/contact us/.
+WSProxy is licensed under a Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License (http://creativecommons.org/licenses/by-nc-sa/4.0/)
