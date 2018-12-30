@@ -1,5 +1,6 @@
 .idea
-custom_scripts
+custom_scripts/*
+!custom_scripts/outgoing.example.js
 node_modules/
 logs/
 *.pem
