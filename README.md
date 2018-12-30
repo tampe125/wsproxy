@@ -37,5 +37,7 @@ Now attach your proxy and visit the [WebSocket echo server](https://www.websocke
 see that every reply from the server has the string ` edited` appended. Since it's just an echo server, returning what you
 sent to him, this means that the message you just sent has been modified by our proxy.
 
+[images/websockets_test.png]
+
 ## License
 WSProxy is licensed under a Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License (http://creativecommons.org/licenses/by-nc-sa/4.0/)
